@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/speedTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speed"
+        android:layout_margin="2dp"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/speedSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/sizeTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/size"
+        android:layout_margin="2dp"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/sizeSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/columnSizeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:text="@string/columns_size"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/columnSizeSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/vertLettersTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:text="@string/space_between_letters_horizontal"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/vertLettersSpaceSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/horLettersTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:text="@string/space_between_letters_vertical"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/horLettersSpaceSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/offsetEndLinesTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:text="@string/offset_end_of_lines"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/offsetEndLinesSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/trailTextProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:text="@string/trail_size"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:id="@+id/trailSeekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/LinearL1"
+        android:layout_height="49dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/fontDropdown"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:spinnerMode="dropdown"
+            android:popupBackground="@drawable/shape" />
+
+        <ImageButton
+            android:id="@+id/trashBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:onClick="deleteItem"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_delete" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <EditText
+        android:id="@+id/rndText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/saveBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/apply"
+        android:layout_weight="6"
+        android:background="@drawable/shape" />
+    </LinearLayout>
+    </LinearLayout>
+</ScrollView>

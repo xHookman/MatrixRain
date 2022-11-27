@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Matrix Rain</string>
+    <string name="top_red_text">Please report on the XDA Page if it work or no for your rom. Please consider a donation if you like all my works it\'s very nice if you do that :), you can find all my works on my XDA page</string>
+    <string name="app_kill">Restart SystemUI (If needed)</string>
+    <string name="color1">Color 1</string>
+    <string name="color2">Color 2</string>
+    <string name="gradient">Gradient</string>
+    <string name="randomize">Random colors</string>
+    <string name="filepickererror">Aborted</string>
+    <string name="invert_direction">Invert direction</string>
+    <string name="size">Font size</string>
+    <string name="vertical_lines_number">Vertical lines number</string>
+    <string name="space_between_letters_vertical">Space between characters (vertical)</string>
+    <string name="space_between_letters_horizontal">Space between characters (horizontal)</string>
+    <string name="offset_end_of_lines">Offset at end of lines</string>
+    <string name="apply">Apply</string>
+    <string name="default_rndtext">ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz</string>
+    <string name="show_settings">Show settings</string>
+    <string name="columns_size">Columns size</string>
+    <string name="background_opacity">Background opacity</string>
+    <string name="donation_thanks">Thanks by advanced if you give me a donation it\'s very nice :) It will support all my free works</string>
+    <string name="speed">Speed (Fast to slow)</string>
+    <string name="position">Position (Background to foreground)</string>
+    <string name="orientation">Orientation</string>
+    <string name="background_color">Background Color</string>
+    <string name="trail_size">Trail Size (Long to short)</string>
+</resources>

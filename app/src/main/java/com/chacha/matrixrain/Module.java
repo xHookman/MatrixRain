@@ -1,14 +1,11 @@
 package com.chacha.matrixrain;
 
+import static com.chacha.matrixrain.Utils.MY_PACKAGE_NAME;
+
 import android.app.AndroidAppHelper;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Environment;
 import android.widget.FrameLayout;
-import java.io.File;
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
-import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
@@ -17,45 +14,16 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
-public class Module implements IXposedHookInitPackageResources, IXposedHookLoadPackage, IXposedHookZygoteInit {
+public class Module implements IXposedHookInitPackageResources, IXposedHookLoadPackage {
     static String SYSTEMUI_PACKAGE_NAME = "com.android.systemui";
-    static String MY_PACKAGE_NAME = "com.chacha.matrixrain";
     boolean mKeyguardShowing;
-    XSharedPreferences pref;
+    XposedPreferences preferences;
     FrameLayout notification_panel;
     com.chacha.matrixrain.MatrixRain matrixRain;
-
-    public void prefLoad() {
-        if (XposedBridge.getXposedVersion() < 93) {
-            pref = getLegacyPrefs();
-        } else {
-            pref = getPref();
-        }
-
-        if (pref != null) {
-            pref.reload();
-        } else {
-            XposedBridge.log("Can't load preference in the module");
-        }
-    }
-
-    @Override
-    public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) {
-        prefLoad();
-    }
-
-    public static XSharedPreferences getPref() {
-        XSharedPreferences pref = new XSharedPreferences(MY_PACKAGE_NAME, "Settings");
-        return pref.getFile().canRead() ? pref : null;
-    }
-
-    private XSharedPreferences getLegacyPrefs() {
-        File f = new File(Environment.getDataDirectory(), "data/" + MY_PACKAGE_NAME + "/shared_prefs/Settings.xml");
-        return new XSharedPreferences(f);
-    }
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
@@ -64,8 +32,9 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                     "isModuleActive", XC_MethodReplacement.returnConstant(true));
         }
 
-        prefLoad();
-        pref.reload();
+        preferences = new XposedPreferences(AndroidAppHelper.currentApplication());
+        preferences.loadPreferences();
+        preferences.loadMatrixRainPrefs();
 
         if (lpparam.packageName.equals(SYSTEMUI_PACKAGE_NAME)) {
             XposedBridge.log("Hooked SystemUI !");
@@ -77,9 +46,8 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
                                 mKeyguardShowing = XposedHelpers.getBooleanField(param.thisObject, "mKeyguardShowing");
-                                if (pref.hasFileChanged()) //To reload without restarting systemui
+                                if (preferences.hasPrefsChanged()) //To reload without restarting systemui
                                     refreshMatrix();
-                                    matrixRain.refreshFont();
 
                                 setMatrixAlpha(((float) param.args[0]) / ((int) callMethod(param.thisObject, "getMaxPanelHeight")));
                             }
@@ -91,9 +59,8 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
                                 mKeyguardShowing = XposedHelpers.getBooleanField(param.thisObject, "mKeyguardShowing");
-                                if (pref.hasFileChanged()) //To reload without restarting systemui
+                                if (preferences.hasPrefsChanged()) //To reload without restarting systemui
                                     refreshMatrix();
-                                    matrixRain.refreshFont();
 
                                 setMatrixAlpha(((float) param.args[0]) / ((int) callMethod(param.thisObject, "getMaxPanelHeight")));
                             }
@@ -106,7 +73,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
                             XposedBridge.log("SystemUI : initPanelBackground !!!!");
-                            matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), pref.getString("rndText", "ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz"), pref.getInt("color1", Color.GREEN), pref.getInt("color2", Color.GREEN), pref.getInt("colorBg", Color.BLACK), pref.getInt("trailSize", 10), pref.getString("fontPath", ""), pref.getInt("speed", 20), pref.getInt("size", 20), pref.getInt("columnSize", 1), pref.getInt("vertLetterSpace", 1), pref.getInt("horLetterSpace", 1), pref.getInt("offsetEndLines", 9), pref.getBoolean("isGradient", false), pref.getBoolean("isRandomColors", false), pref.getBoolean("isInvert", false), true);
+                            matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
                             if(notification_panel!=null)
                                 setMatrixView();
                         }
@@ -143,7 +110,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             @Override
                 public void handleLayoutInflated(LayoutInflatedParam liparam) {
                                 notification_panel = liparam.view.findViewById(liparam.res.getIdentifier("notification_panel", "id", SYSTEMUI_PACKAGE_NAME));
-                                matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), pref.getString("rndText", "ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz"), pref.getInt("color1", Color.GREEN), pref.getInt("color2", Color.GREEN), pref.getInt("colorBg", Color.BLACK), pref.getInt("trailSize", 10), pref.getString("fontPath", ""), pref.getInt("speed", 20), pref.getInt("size", 20), pref.getInt("columnSize", 1), pref.getInt("vertLetterSpace", 1), pref.getInt("horLetterSpace", 1), pref.getInt("offsetEndLines", 9), pref.getBoolean("isGradient", false), pref.getBoolean("isRandomColors", false), pref.getBoolean("isInvert", false), true);
+                                matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
                                 setMatrixView();
                 }
             });
@@ -163,22 +130,23 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
 
     public void setMatrixAlpha(float alpha){
         if (!mKeyguardShowing) {
-            matrixRain.setAlpha((float) pref.getInt("opacityBg", 100) / 100 * alpha);
+            matrixRain.setAlpha((float) preferences.opacityBg / 100 * alpha);
         } else {
             matrixRain.setAlpha(0); //Without this line the matrix will randomly be showed on lockscreen
         }
     }
 
     public void refreshMatrix(){
-        prefLoad();
+        preferences.loadPreferences();
+        preferences.loadMatrixRainPrefs();
         notification_panel.removeView(matrixRain);
-        matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), pref.getString("rndText", "ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz"), pref.getInt("color1", Color.GREEN), pref.getInt("color2", Color.GREEN), pref.getInt("colorBg", Color.BLACK), pref.getInt("trailSize", 10), pref.getString("fontPath", ""), pref.getInt("speed", 20), pref.getInt("size", 20), pref.getInt("columnSize", 1), pref.getInt("vertLetterSpace", 1), pref.getInt("horLetterSpace", 1), pref.getInt("offsetEndLines", 9), pref.getBoolean("isGradient", false), pref.getBoolean("isRandomColors", false), pref.getBoolean("isInvert", false), true);
+        matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
         setMatrixView();
     }
 
     public void setMatrixView() {
         try {
-            notification_panel.addView(matrixRain, pref.getInt("position", 8));
+            notification_panel.addView(matrixRain, preferences.position);
         } catch (IndexOutOfBoundsException e) {
             notification_panel.addView(matrixRain, 1);
         }

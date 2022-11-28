@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import eu.chainfire.libsuperuser.Shell;
 
 public class Utils {
+    public static final String MY_PACKAGE_NAME = "com.chacha.matrixrain";
     private static boolean isModuleActive(){
         return false;
     }

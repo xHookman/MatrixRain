@@ -1,7 +1,7 @@
 package com.chacha.matrixrain;
 
-import static com.chacha.matrixrain.Preference.editor;
-import static com.chacha.matrixrain.Preference.pref;
+import static com.chacha.matrixrain.Preferences.editor;
+import static com.chacha.matrixrain.Preferences.pref;
 
 import android.app.AlertDialog;
 import android.content.Context;

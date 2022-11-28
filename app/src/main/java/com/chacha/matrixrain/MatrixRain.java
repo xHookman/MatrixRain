@@ -1,8 +1,8 @@
 package com.chacha.matrixrain;
 
-import android.Manifest;
+import static com.chacha.matrixrain.Preferences.loadPreferences;
+
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,7 +14,7 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
-import com.coniy.fileprefs.FileSharedPreferences;
+
 import java.io.File;
 import java.util.Random;
 import android.os.Handler;
@@ -28,55 +28,30 @@ public class MatrixRain extends View {
     private int width, height;
     private Canvas canvas;
     private Bitmap canvasBmp;
-    private int fontSize, columnSize, speed;
-    private int verticalLetterSpace, horizontalLetterSpace;
-    private float offsEndLines;
-    private char[] chars;
     private float[] txtPosByColumn;
     private Paint paintTxt, paintBg, paintBgBmp, paintInitBg;
-    private int choosedColor1, choosedColor2, choosedColorBg, trailSize;
-    private String choosedFont;
-    boolean gradient, randomColors, isInvert, xposed, isPausedDev=false;
+    boolean isXposed;
     final Handler handler = new Handler();
-    static String sharedPrefsFile = "Settings";
+    Preferences preferences;
+    Context context;
 
     @SuppressLint("WorldReadableFiles")
-    public MatrixRain(Context context, String rndText, int color1, int color2, int colorBg, int trail, String font, int speedS, int size, int columnSizex, int vertLetterSpace, int horLetterSpace, float offsetEndLines, boolean isgradient, boolean isRandomColors, boolean isInvertVal, boolean xposedModule) {
+    public MatrixRain(Context context) {
         super(context);
-        try {
-            //noinspection deprecation
-            sharedPreferences = context.getSharedPreferences(sharedPrefsFile, Context.MODE_WORLD_READABLE);
-        } catch (SecurityException ignored) {
-            sharedPreferences = context.getSharedPreferences(sharedPrefsFile, Context.MODE_PRIVATE);
-        }
-        FileSharedPreferences.makeWorldReadable(context.getPackageName(), sharedPrefsFile);
-        xposed = xposedModule;
-        if(xposedModule) {
-            choosedColor1 = color1;
-            choosedColor2 = color2;
-            choosedColorBg = colorBg;
-            trailSize = trail;
-            chars = rndText.toCharArray();
-            choosedFont = font;
-            fontSize = size;
-            speed = speedS;
-            gradient = isgradient;
-            randomColors = isRandomColors;
-            isInvert = isInvertVal;
-            columnSize = columnSizex;
-            verticalLetterSpace = vertLetterSpace;
-            horizontalLetterSpace = horLetterSpace;
-            offsEndLines = offsetEndLines;
-
-            if(offsEndLines==9)
-                offsEndLines=0.965f;
-            else if(offsEndLines==10)
-                offsEndLines=0.995f;
-            else
-                offsEndLines/=10;
-        }
-
+        preferences = new Preferences(context);
+        sharedPreferences= loadPreferences(context);
+        isXposed = false;
         refresh(false);
+    }
+
+    @SuppressLint("WorldReadableFiles")
+    public MatrixRain(Context context, Preferences preferences) { // Constructor used by module
+        super(context);
+        this.preferences = preferences;
+        sharedPreferences=loadPreferences(context);
+        isXposed=true;
+        refresh(false);
+        this.context = context;
     }
 
     @Override
@@ -93,23 +68,23 @@ public class MatrixRain extends View {
         super.onDraw(canvas);
         canvas.drawBitmap(canvasBmp, 0, 0, paintBgBmp);
         drawCanvas();
-        handler.postDelayed(this::invalidate, speed);
+        handler.postDelayed(this::invalidate, preferences.speed);
     }
 
     private void drawText() {
-            if (gradient) {
-                paintTxt.setShader(new LinearGradient(0, 0, 0, getHeight(), choosedColor1, choosedColor2, Shader.TileMode.MIRROR));
-            } else if (!randomColors) {
-                paintTxt.setColor(choosedColor1);
+            if (preferences.isGradient) {
+                paintTxt.setShader(new LinearGradient(0, 0, 0, getHeight(), preferences.choosedColor1, preferences.choosedColor2, Shader.TileMode.MIRROR));
+            } else if (!preferences.isRandomColors) {
+                paintTxt.setColor(preferences.choosedColor1);
             }
 
                 for (int i = 0; i < txtPosByColumn.length; i++) {
-                    if (randomColors)
+                    if (preferences.isRandomColors)
                         paintTxt.setColor(randomizeColor());
-                    for (int j = 0; j < columnSize; j++)
-                        canvas.drawText("" + chars[random.nextInt(chars.length)], (i + j) * verticalLetterSpace * fontSize, txtPosByColumn[i] * horizontalLetterSpace * fontSize, paintTxt);
+                    for (int j = 0; j < preferences.columnSize; j++)
+                        canvas.drawText("" + preferences.text[random.nextInt(preferences.text.length)], (i + j) * preferences.vertLetterSpace * preferences.fontSize, txtPosByColumn[i] * preferences.horLetterSpace * preferences.fontSize, paintTxt);
 
-                    if (txtPosByColumn[i] * fontSize > height && Math.random() > offsEndLines) { //Décalage entre les differentes lignes verticales
+                    if (txtPosByColumn[i] * preferences.fontSize > height && Math.random() > preferences.offsetEndLines) { //Décalage entre les differentes lignes verticales
                         txtPosByColumn[i] = 0;
                     }
                     txtPosByColumn[i]++;
@@ -121,60 +96,35 @@ public class MatrixRain extends View {
         drawText();
     }
 
-    public void nonXposedPrefs(){
-        choosedColor1 = sharedPreferences.getInt("color1", Color.GREEN);
-        choosedColor2 = sharedPreferences.getInt("color2", Color.GREEN);
-        choosedColorBg = sharedPreferences.getInt("colorBg", Color.BLACK);
-        trailSize = sharedPreferences.getInt("trailSize", 10);
-        chars = sharedPreferences.getString("rndText", getResources().getString(R.string.default_rndtext)).toCharArray();
-        choosedFont = sharedPreferences.getString("fontPath", "");
-        fontSize = sharedPreferences.getInt("size", 20);
-        speed = sharedPreferences.getInt("speed", 20);
-        gradient = sharedPreferences.getBoolean("isGradient", false);
-        randomColors = sharedPreferences.getBoolean("isRandomColors", false);
-        isInvert = sharedPreferences.getBoolean("isInvert", false);
-        columnSize = sharedPreferences.getInt("columnSize", 1);
-        verticalLetterSpace = sharedPreferences.getInt("vertLetterSpace", 1);
-        horizontalLetterSpace = sharedPreferences.getInt("horLetterSpace", 1);
-        offsEndLines = sharedPreferences.getInt("offsetEndLines", 9);
-        isPausedDev = sharedPreferences.getBoolean("isPausedDev", false);
-
-        if(offsEndLines==9)
-            offsEndLines=0.965f;
-        else if(offsEndLines==10)
-            offsEndLines=0.995f;
-        else
-            offsEndLines/=10;
-    }
-
     public void refreshFont(){
-        File f = new File(choosedFont);
+        Log.e("refreshFont", "refreshFont : " + preferences.fontPath);
+        File f = new File(preferences.fontPath);
         if(f.exists())
-            paintTxt.setTypeface(Typeface.createFromFile(choosedFont));
+            paintTxt.setTypeface(Typeface.createFromFile(preferences.fontPath));
     }
 
     public void refresh(boolean recreateView){
-        if(!xposed) {
-            nonXposedPrefs();
+        if(!isXposed) {
+            preferences.loadMatrixRainPrefs();
         }
         random = new Random();
 
         paintTxt = new Paint();
         paintTxt.setStyle(Paint.Style.FILL);
-        paintTxt.setTextSize(fontSize);
+        paintTxt.setTextSize(preferences.fontSize);
 
         refreshFont();
 
         paintBg = new Paint();
-        paintBg.setColor(choosedColorBg);
-        paintBg.setAlpha(trailSize);
+        paintBg.setColor(preferences.choosedColorBg);
+        paintBg.setAlpha(preferences.trailSize);
         paintBg.setStyle(Paint.Style.FILL);
 
         paintBgBmp = new Paint();
-        paintBgBmp.setColor(choosedColorBg);
+        paintBgBmp.setColor(preferences.choosedColorBg);
 
         paintInitBg = new Paint();
-        paintInitBg.setColor(choosedColorBg);
+        paintInitBg.setColor(preferences.choosedColorBg);
         paintInitBg.setAlpha(256);
         paintInitBg.setStyle(Paint.Style.FILL);
 
@@ -184,14 +134,14 @@ public class MatrixRain extends View {
 
     public void recreateView(){
         canvasBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        canvasBmp.eraseColor(choosedColorBg);
+        canvasBmp.eraseColor(preferences.choosedColorBg);
         canvas = new Canvas(canvasBmp);
 
-        if(isInvert)
+        if(preferences.isInvert)
             canvas.rotate(180, (float) (width / 2), (float) height / 2);
 
         canvas.drawRect(0, 0, width, height, paintInitBg);
-        int matrixWidth = width / fontSize;
+        int matrixWidth = width / preferences.fontSize;
 
         txtPosByColumn = new float[matrixWidth + 1];
 

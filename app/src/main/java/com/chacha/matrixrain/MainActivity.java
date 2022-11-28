@@ -7,13 +7,12 @@ import static android.os.Build.VERSION.SDK_INT;
 import static com.chacha.matrixrain.CopyAssetsFiles.copyAssetFolder;
 import static com.chacha.matrixrain.Donation.openDonationLink;
 import static com.chacha.matrixrain.Donation.remindDonation;
+import static com.chacha.matrixrain.Preferences.editor;
 import static com.chacha.matrixrain.Utils.checkXposed;
 import static com.chacha.matrixrain.Utils.killSystemUi;
-import static com.chacha.matrixrain.Utils.unrooted;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -48,16 +47,14 @@ import androidx.core.content.ContextCompat;
 import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 import com.coniy.fileprefs.FileSharedPreferences;
 import org.apache.commons.io.FileUtils;
-import java.io.DataOutputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import eu.chainfire.libsuperuser.Shell;
 
 public class MainActivity extends AppCompatActivity {
     ColorPickerDialog colorPickerDialog;
     SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
     static String sharedPrefsFile = "Settings";
     static String fontsFolder = "MatrixRain";
 
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sharedPreferences=Preference.loadPreferences(this);
+        sharedPreferences= Preferences.loadPreferences(this);
 
         colorPickerDialog = ColorPickerDialog.createColorPickerDialog(this, ColorPickerDialog.DARK_THEME);
 
@@ -161,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         position.setMax(10);
         trail.setMax(255);
 
-        matrixRain = new MatrixRain(this, "ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz",0, 0, 0, 0, sharedPreferences.getString("fontPath", ""), 0, 0,0, 0, 0, 0, false, false,false, false);
+        matrixRain = new MatrixRain(this);
         LinearLayout linearLayout = findViewById(R.id.mainLayout);
         linearLayout.addView(matrixRain);
 

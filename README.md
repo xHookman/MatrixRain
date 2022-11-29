@@ -1,5 +1,5 @@
 # MatrixRain
-Add a customisable matrix rain in notifications panel using Xposed Framework
+Add a customisable matrix rain in notifications panel using Xposed Framework (Compatible with LSPosed)
 
 /!\SINCE RIRU V22 YOU MUST ENABLE RESOURCE HOOK IN LSPOSED SETTINGS/!\
 Thanks to @Hyper.Alvi for his help !

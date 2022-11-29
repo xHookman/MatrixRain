@@ -8,13 +8,13 @@ import android.widget.Toast;
 
 public class Donation {
 
-    protected static void openDonationLink(Context context) {
+    public static void openDonationLink(Context context) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A3YW496LXQZ5A&source=url"));
         context.startActivity(browserIntent);
         Toast.makeText(context, context.getResources().getString(R.string.donation_thanks), Toast.LENGTH_LONG).show();
     }
 
-    protected static void remindDonation(Context context) {
+    public static void remindDonation(Context context) {
         int nb = Preferences.getPrefs().getInt("donationReminder", 0);
         if (Preferences.getPrefs().getBoolean("donationRemindBool", true)) {
             if (nb % 4 == 0) {

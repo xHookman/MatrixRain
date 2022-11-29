@@ -118,7 +118,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
         }*/
     }
 
-    public void setMatrixAlpha(float alpha){
+    private void setMatrixAlpha(float alpha){
         if (!mKeyguardShowing) {
             matrixRain.setAlpha((float) preferences.opacityBg / 100 * alpha);
         } else {
@@ -126,7 +126,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
         }
     }
 
-    public void refreshMatrix(){
+    private void refreshMatrix(){
         preferences.loadPreferences();
         preferences.loadMatrixRainPrefs();
         notification_panel.removeView(matrixRain);
@@ -134,7 +134,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
         setMatrixView();
     }
 
-    public void setMatrixView() {
+    private void setMatrixView() {
         matrixRain.refreshFont();
         try {
             notification_panel.addView(matrixRain, preferences.position);
@@ -143,7 +143,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
         }
     }
 
-    public void refreshMatrixIfNeeded(){
+    private void refreshMatrixIfNeeded(){
         if(preferences.hasPrefsChanged()){
             refreshMatrix();
         }

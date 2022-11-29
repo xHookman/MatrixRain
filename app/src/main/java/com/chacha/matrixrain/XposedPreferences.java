@@ -11,7 +11,7 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 
 public class XposedPreferences extends Preferences {
-    public XSharedPreferences pref;
+    private XSharedPreferences pref;
 
     public XposedPreferences(Context context) {
         super(context);
@@ -72,5 +72,8 @@ public class XposedPreferences extends Preferences {
 
     public boolean hasPrefsChanged(){
         return pref.hasFileChanged();
+    }
+    public void reloadPrefs(){
+        pref.reload();
     }
 }

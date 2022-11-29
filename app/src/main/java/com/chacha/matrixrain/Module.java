@@ -6,6 +6,7 @@ import android.app.AndroidAppHelper;
 import android.widget.FrameLayout;
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
@@ -16,14 +17,21 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
-public class Module implements IXposedHookInitPackageResources, IXposedHookLoadPackage {
+public class Module implements IXposedHookInitPackageResources, IXposedHookLoadPackage, IXposedHookZygoteInit {
     static String SYSTEMUI_PACKAGE_NAME = "com.android.systemui";
     boolean mKeyguardShowing;
     XposedPreferences preferences;
     FrameLayout notification_panel;
     com.chacha.matrixrain.MatrixRain matrixRain;
+
+    @Override
+    public void initZygote(StartupParam startupParam) {
+        preferences = new XposedPreferences(AndroidAppHelper.currentApplication());
+        preferences.loadPreferences();
+    }
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
@@ -32,8 +40,8 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                     "isModuleActive", XC_MethodReplacement.returnConstant(true));
         }
 
-        preferences = new XposedPreferences(AndroidAppHelper.currentApplication());
         preferences.loadPreferences();
+        preferences.reloadPrefs();
         preferences.loadMatrixRainPrefs();
 
         if (lpparam.packageName.equals(SYSTEMUI_PACKAGE_NAME)) {
@@ -46,9 +54,7 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
                                 mKeyguardShowing = XposedHelpers.getBooleanField(param.thisObject, "mKeyguardShowing");
-                                if (preferences.hasPrefsChanged()) //To reload without restarting systemui
-                                    refreshMatrix();
-
+                                refreshMatrixIfNeeded();
                                 setMatrixAlpha(((float) param.args[0]) / ((int) callMethod(param.thisObject, "getMaxPanelHeight")));
                             }
                         });
@@ -59,25 +65,22 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                                 super.beforeHookedMethod(param);
                                 mKeyguardShowing = XposedHelpers.getBooleanField(param.thisObject, "mKeyguardShowing");
-                                if (preferences.hasPrefsChanged()) //To reload without restarting systemui
-                                    refreshMatrix();
-
+                                refreshMatrixIfNeeded();
                                 setMatrixAlpha(((float) param.args[0]) / ((int) callMethod(param.thisObject, "getMaxPanelHeight")));
                             }
                         });
             }
 
-            findAndHookMethod(SYSTEMUI_PACKAGE_NAME + ".statusbar.phone.NotificationPanelViewController", lpparam.classLoader,
-                    "initPanelBackground", new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            super.beforeHookedMethod(param);
-                            XposedBridge.log("SystemUI : initPanelBackground !!!!");
-                            matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
-                            if(notification_panel!=null)
-                                setMatrixView();
-                        }
-                    });
+            findAndHookConstructor("com.android.systemui.statusbar.phone.NotificationPanelView", lpparam.classLoader, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    XposedBridge.log("SystemUI : hooked notifications panel constructor !!!!");
+                    matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
+                    if(notification_panel!=null)
+                        setMatrixView();
+                }
+            });
         }
        /* if(lpparam.packageName == "com.sec.android.app.launcher") {
             findAndHookMethod("com.android.quickstep.views.ShelfScrimView", lpparam.classLoader,
@@ -145,10 +148,18 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
     }
 
     public void setMatrixView() {
+        matrixRain.refreshFont();
         try {
             notification_panel.addView(matrixRain, preferences.position);
         } catch (IndexOutOfBoundsException e) {
             notification_panel.addView(matrixRain, 1);
         }
+    }
+
+    public void refreshMatrixIfNeeded(){
+        if(preferences.hasPrefsChanged()){
+            refreshMatrix();
+        }
+        matrixRain.refreshFont();
     }
 }

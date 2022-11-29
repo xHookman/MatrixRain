@@ -1,6 +1,7 @@
 package com.chacha.matrixrain;
 
 import static com.chacha.matrixrain.Utils.MY_PACKAGE_NAME;
+import static com.chacha.matrixrain.Utils.prefFileName;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,10 +17,8 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 
 public class Preferences {
-    public static SharedPreferences pref;
-    public static SharedPreferences.Editor editor;
-    private static final String prefFileName = "Settings";
-    public final Context context;
+    private static SharedPreferences pref;
+    private static SharedPreferences.Editor editor;
 
     public int fontSize, columnSize, speed;
     public int vertLetterSpace, horLetterSpace;
@@ -31,11 +30,7 @@ public class Preferences {
     public String fontPath;
     public boolean isGradient, isRandomColors, isInvert;
 
-    public Preferences(Context context) {
-      this.context = context;
-    }
-
-    protected static SharedPreferences loadPreferences(Context context){
+    public static SharedPreferences loadPreferences(Context context){
         try {
             //noinspection deprecation
             pref = context.getSharedPreferences(prefFileName, Context.MODE_WORLD_READABLE);
@@ -52,7 +47,7 @@ public class Preferences {
         choosedColor2 = pref.getInt("color2", Color.GREEN);
         choosedColorBg = pref.getInt("colorBg", Color.BLACK);
         trailSize = pref.getInt("trailSize", 10);
-        text = pref.getString("rndText", context.getResources().getString(R.string.default_rndtext)).toCharArray();
+        text = pref.getString("rndText", "ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz").toCharArray();
         fontPath = pref.getString("fontPath", "");
         fontSize = pref.getInt("size", 20);
         speed = pref.getInt("speed", 20);
@@ -72,5 +67,13 @@ public class Preferences {
             offsetEndLines=0.995f;
         else
             offsetEndLines/=10;
+    }
+
+    public static SharedPreferences getPrefs(){
+        return pref;
+    }
+
+    public static SharedPreferences.Editor getEditor(){
+        return editor;
     }
 }

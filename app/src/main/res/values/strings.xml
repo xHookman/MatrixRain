@@ -14,7 +14,6 @@
     <string name="space_between_letters_horizontal">Space between characters (horizontal)</string>
     <string name="offset_end_of_lines">Offset at end of lines</string>
     <string name="apply">Apply</string>
-    <string name="default_rndtext">ABCDEFGHIJKLMNOPQRSTUVWSYZabcdefghijklmnopqrstuvwyz</string>
     <string name="show_settings">Show settings</string>
     <string name="columns_size">Columns size</string>
     <string name="background_opacity">Background opacity</string>

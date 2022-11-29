@@ -1,8 +1,5 @@
 package com.chacha.matrixrain;
 
-import static com.chacha.matrixrain.Preferences.editor;
-import static com.chacha.matrixrain.Preferences.pref;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,26 +15,26 @@ public class Donation {
     }
 
     protected static void remindDonation(Context context) {
-        int nb = pref.getInt("donationReminder", 0);
-        if (pref.getBoolean("donationRemindBool", true)) {
+        int nb = Preferences.getPrefs().getInt("donationReminder", 0);
+        if (Preferences.getPrefs().getBoolean("donationRemindBool", true)) {
             if (nb % 4 == 0) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, 4);
                 builder.setMessage("Hey, do not forget to give a donation for these free works if you can, I'm a student :) It will be very nice if you do it")
                         .setNegativeButton("Pleeeeeeeaaaaase stop", (dialog, id) -> {
-                            editor.putBoolean("donationRemindBool", false);
-                            editor.apply();
+                            Preferences.getEditor().putBoolean("donationRemindBool", false);
+                            Preferences.getEditor().apply();
                         })
                         .setNeutralButton("Later", (dialog, id) -> {})
                         .setPositiveButton("Do it now", (dialog, id) -> {
-                            editor.putBoolean("donationRemindBool", false);
+                            Preferences.getEditor().putBoolean("donationRemindBool", false);
                             openDonationLink(context);
-                            editor.apply();
+                            Preferences.getEditor().apply();
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
             }
-            editor.putInt("donationReminder", nb + 1);
-            editor.apply();
+            Preferences.getEditor().putInt("donationReminder", nb + 1);
+            Preferences.getEditor().apply();
         }
     }
 }

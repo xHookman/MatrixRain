@@ -7,7 +7,6 @@ import static android.os.Build.VERSION.SDK_INT;
 import static com.chacha.matrixrain.CopyAssetsFiles.copyAssetFolder;
 import static com.chacha.matrixrain.Donation.openDonationLink;
 import static com.chacha.matrixrain.Donation.remindDonation;
-import static com.chacha.matrixrain.Preferences.editor;
 import static com.chacha.matrixrain.Utils.checkXposed;
 import static com.chacha.matrixrain.Utils.killSystemUi;
 
@@ -123,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
             c2 = Color.parseColor(sharedPreferences.getString("color2", "#ff00ff00"));
             c3 = Color.parseColor(sharedPreferences.getString("colorBg", "#ff000000"));
 
-            editor.putInt("color1", c1);
-            editor.putInt("color2", c2);
-            editor.putInt("colorBg", c3);
-            editor.apply();
+            Preferences.getEditor().putInt("color1", c1);
+            Preferences.getEditor().putInt("color2", c2);
+            Preferences.getEditor().putInt("colorBg", c3);
+            Preferences.getEditor().apply();
             FileSharedPreferences.makeWorldReadable(getPackageName(), sharedPrefsFile);
             color1 = c1;
             color2 = c2;
@@ -187,14 +186,14 @@ public class MainActivity extends AppCompatActivity {
                 String fontPath = "";
                 ItemsNumber = FileList.GetFiles(Environment.getExternalStorageDirectory().getPath() + "/" + fontsFolder + "/").length;
                         if (position == 0)
-                            editor.putString("fontPath", "");
+                            Preferences.getEditor().putString("fontPath", "");
                         else if (position == ItemsNumber+1)
                             getFont();
                         else
                             fontPath = Environment.getExternalStorageDirectory().getPath() + "/" + fontsFolder + "/" + parentView.getItemAtPosition(position).toString();
-                            editor.putString("fontPath", fontPath);
-                    editor.putInt("fontChoice", position);
-                    editor.commit();
+                Preferences.getEditor().putString("fontPath", fontPath);
+                Preferences.getEditor().putInt("fontChoice", position);
+                Preferences.getEditor().commit();
                     FileSharedPreferences.makeWorldReadable(getPackageName(), sharedPrefsFile);
                     File f = new File(fontPath);
 
@@ -211,8 +210,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         save.setOnClickListener(view -> {
-            editor.putString("rndText", String.valueOf(rndText.getText()));
-            editor.apply();
+            Preferences.getEditor().putString("rndText", String.valueOf(rndText.getText()));
+            Preferences.getEditor().apply();
             matrixRain.refresh(false);
         });
 
@@ -242,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
             if(b)
                 randomize.setChecked(false);
 
-            editor.putBoolean("isGradient", b);
-            editor.apply();
+            Preferences.getEditor().putBoolean("isGradient", b);
+            Preferences.getEditor().apply();
             matrixRain.refresh(false);
         });
 
@@ -251,14 +250,14 @@ public class MainActivity extends AppCompatActivity {
             if(b)
                 gradient.setChecked(false);
 
-            editor.putBoolean("isRandomColors", b);
-            editor.apply();
+            Preferences.getEditor().putBoolean("isRandomColors", b);
+            Preferences.getEditor().apply();
             matrixRain.refresh(false);
         });
 
         invert.setOnCheckedChangeListener((compoundButton, b) -> {
-            editor.putBoolean("isInvert", b);
-            editor.apply();
+            Preferences.getEditor().putBoolean("isInvert", b);
+            Preferences.getEditor().apply();
             matrixRain.refresh(true);
         });
 
@@ -415,8 +414,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void seekbarsFunc(TextView textProgress, String text, String prefName, int i){
         textProgress.setText(text + " : " + i);
-        editor.putInt(prefName, i);
-        editor.apply();
+        Preferences.getEditor().putInt(prefName, i);
+        Preferences.getEditor().apply();
         matrixRain.refresh(true);
     }
 
@@ -427,8 +426,8 @@ public class MainActivity extends AppCompatActivity {
     public void colorChoose(Button button, String sharedPref){
         colorPickerDialog.setInitialColor(button.getCurrentTextColor());
         colorPickerDialog.setOnColorPickedListener((color, hexVal) -> {
-            editor.putInt(sharedPref, color);
-            editor.commit();
+            Preferences.getEditor().putInt(sharedPref, color);
+            Preferences.getEditor().commit();
             button.setTextColor(color);
             matrixRain.refresh(false);
         });

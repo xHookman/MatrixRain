@@ -1,10 +1,7 @@
 package com.chacha.matrixrain;
 
-import static com.chacha.matrixrain.Preferences.loadPreferences;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,16 +11,13 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
-
 import java.io.File;
 import java.util.Random;
 import android.os.Handler;
-import android.widget.Toast;
 
 @SuppressLint("ViewConstructor")
 public class MatrixRain extends View {
 
-    SharedPreferences sharedPreferences;
     private static Random random;
     private int width, height;
     private Canvas canvas;
@@ -38,8 +32,7 @@ public class MatrixRain extends View {
     @SuppressLint("WorldReadableFiles")
     public MatrixRain(Context context) {
         super(context);
-        preferences = new Preferences(context);
-        sharedPreferences= loadPreferences(context);
+        preferences = new Preferences();
         isXposed = false;
         refresh(false);
     }
@@ -48,7 +41,6 @@ public class MatrixRain extends View {
     public MatrixRain(Context context, Preferences preferences) { // Constructor used by module
         super(context);
         this.preferences = preferences;
-        sharedPreferences=loadPreferences(context);
         isXposed=true;
         refresh(false);
         this.context = context;

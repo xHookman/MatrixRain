@@ -2,7 +2,6 @@ package com.chacha.matrixrain;
 
 import static com.chacha.matrixrain.Utils.MY_PACKAGE_NAME;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Environment;
 import java.io.File;
@@ -12,10 +11,6 @@ import de.robv.android.xposed.XposedBridge;
 
 public class XposedPreferences extends Preferences {
     private XSharedPreferences pref;
-
-    public XposedPreferences(Context context) {
-        super(context);
-    }
 
     private XSharedPreferences getPref() {
         XSharedPreferences pref = new XSharedPreferences(MY_PACKAGE_NAME, "Settings");

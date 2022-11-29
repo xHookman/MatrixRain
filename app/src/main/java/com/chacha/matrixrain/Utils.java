@@ -10,6 +10,8 @@ import eu.chainfire.libsuperuser.Shell;
 
 public class Utils {
     public static final String MY_PACKAGE_NAME = "com.chacha.matrixrain";
+    public static final String prefFileName = "Settings";
+
     private static boolean isModuleActive(){
         return false;
     }

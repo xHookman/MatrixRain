@@ -35,3 +35,5 @@ Thank you for reading this, don't forget to press thanks on my XDA page ^_^
 PS : I'm french, so I try to speak english I hope your eyes still lives and that there are not too mistakes.
 
 Credits to this website for the tutorial to create a matrix rain view : http://www.ssaurel.com/blog/create-a-matrix-effect-on-android/
+
+I hope quality of my code will won't make you want to die, I made this code more readable for open source and I'm a student so I'm learning at the same time :)

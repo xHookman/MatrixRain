@@ -70,17 +70,6 @@ public class Module implements IXposedHookInitPackageResources, IXposedHookLoadP
                             }
                         });
             }
-
-            findAndHookConstructor("com.android.systemui.statusbar.phone.NotificationPanelView", lpparam.classLoader, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.beforeHookedMethod(param);
-                    XposedBridge.log("SystemUI : hooked notifications panel constructor !!!!");
-                    matrixRain = new com.chacha.matrixrain.MatrixRain(AndroidAppHelper.currentApplication(), preferences);
-                    if(notification_panel!=null)
-                        setMatrixView();
-                }
-            });
         }
        /* if(lpparam.packageName == "com.sec.android.app.launcher") {
             findAndHookMethod("com.android.quickstep.views.ShelfScrimView", lpparam.classLoader,
